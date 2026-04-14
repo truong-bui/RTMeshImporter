@@ -16,7 +16,7 @@
 #include "Developer/DesktopPlatform/Public/IDesktopPlatform.h"
 #include "Developer/DesktopPlatform/Public/DesktopPlatformModule.h"
 #include "Framework/Application/SlateApplication.h"
-#include "RuntimeMeshCore.h"
+#include "ProceduralMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Serialization/BufferArchive.h"
 #include "Serialization/ArchiveSaveCompressedProxy.h"
@@ -262,7 +262,7 @@ void URTMeshImporterComponent::ProcessNode(const aiNode* Node, const aiScene* Sc
 		TArray<FVector> Normals;
 		TArray<FVector2D> UV0;
 		TArray<int32> Triangles;
-		TArray<FRuntimeMeshTangent> Tangents;
+		TArray<FProcMeshTangent> Tangents;
 		TArray<FColor> VertexColor;
 
 		// Get current mesh for processing
@@ -323,7 +323,7 @@ void URTMeshImporterComponent::ProcessNode(const aiNode* Node, const aiScene* Sc
 
 			if (Mesh->HasTangentsAndBitangents())
 			{
-				Tangents.Push(FRuntimeMeshTangent(Mesh->mTangents[j].y, Mesh->mTangents[j].x, Mesh->mTangents[j].z));
+				Tangents.Push(FProcMeshTangent(Mesh->mTangents[j].y, Mesh->mTangents[j].x, Mesh->mTangents[j].z));
 			}
 			else
 			{

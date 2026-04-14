@@ -9,9 +9,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RuntimeMeshRenderable.h"
 #include "Misc/DateTime.h"
-#include "Providers/RuntimeMeshProviderStatic.h"
 #include "RTMeshData.generated.h"
 
 struct FRTTextureInfo

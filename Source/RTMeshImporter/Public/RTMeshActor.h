@@ -10,7 +10,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/RuntimeMeshComponentStatic.h"
+#include "ProceduralMeshComponent.h"
 #include "RTMeshData.h"
 #include "RTMeshActor.generated.h"
 
@@ -43,7 +43,7 @@ public:
 
 	// Array of procedural mesh components
 //	UPROPERTY(BlueprintReadWrite, VisibleDefaultsOnly, Category = "RTMeshActor")
-	TMap<FString, URuntimeMeshComponentStatic*> RuntimeMeshComponents;
+	TMap<FString, UProceduralMeshComponent*> RuntimeMeshComponents;
 
 	//UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, Category = "RTMeshActor")
 	//FString MeshName;	
@@ -97,17 +97,17 @@ private:
 public:	
 	// Draw mesh section
 	void DrawMeshSection(const FRTMaterialInfo& MaterialInfo, const TArray<FVector>& Vertices, const TArray<int32>& Triangles, const TArray<FVector>& Normals,
-		const TArray<FVector2D>& UV0, const TArray<FColor>& VertexColor, const TArray<FRuntimeMeshTangent>& Tangents, bool bCreateCollision = true);	
+		const TArray<FVector2D>& UV0, const TArray<FColor>& VertexColor, const TArray<FProcMeshTangent>& Tangents, bool bCreateCollision = true);	
 
 	/**
 	 * Change the texture map of the section. Use this instead of directly change texture parameter in material instance dynamic.
 	 * This function will save the texture path for saving and loading.
-	 * @param RuntimeMeshComponent RuntimeMeshComponent that need to change texture map.
+	 * @param ProceduralMeshComponent UProceduralMeshComponent that need to change texture map.
 	 * @param TextureParemeterName Material instance dynamic parameter (i.e DiffuseTexture)
 	 * @param TexturePath Texture full path
 	 **/
 	UFUNCTION(BlueprintCallable, Category = "RTMeshActor")
-	void ChangeSectionTexture(URuntimeMeshComponentStatic* RuntimeMeshComponent, FName TextureParameterName, FString TexturePath);
+	void ChangeSectionTexture(UProceduralMeshComponent* ProceduralMeshComponent, FName TextureParameterName, FString TexturePath);
 private:
 	// Create procedural mesh component and add to ProceduralMeshComponents array
 	void CreateRuntimeMeshComponent(FString ComponentName);	

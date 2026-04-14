@@ -10,7 +10,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/RuntimeMeshComponentStatic.h"
+#include "ProceduralMeshComponent.h"
 #include "RTSectionActor.generated.h"
 
 UCLASS()
@@ -23,7 +23,7 @@ public:
 	ARTSectionActor();
 	
 	UPROPERTY(BlueprintReadWrite, VisibleDefaultsOnly, Category = "RTSectionActor")
-	URuntimeMeshComponentStatic* RuntimeMeshComponent;
+	UProceduralMeshComponent* RuntimeMeshComponent;
 	
 protected:
 	// Called when the game starts or when spawned

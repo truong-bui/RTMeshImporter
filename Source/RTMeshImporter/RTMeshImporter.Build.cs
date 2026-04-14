@@ -37,7 +37,7 @@ public class RTMeshImporter : ModuleRules
 		
 		PrivateIncludePaths.AddRange( new string[] {} );			
 		
-		PublicDependencyModuleNames.AddRange( new string[] { "Core", "RuntimeMeshComponent" } );			
+		PublicDependencyModuleNames.AddRange( new string[] { "Core", "ProceduralMeshComponent" } );			
 		
 		PrivateDependencyModuleNames.AddRange( new string[] { "CoreUObject", "Engine", "Slate", "SlateCore", "UMG", "AppFramework" } );
 		

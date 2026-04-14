@@ -11,7 +11,6 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialInstanceDynamic.h"
-#include "Providers/RuntimeMeshProviderStatic.h"
 #include "ImageUtils.h"
 
 // Sets default values
@@ -35,11 +34,11 @@ ARTMeshActor::ARTMeshActor()
 }
 
 void ARTMeshActor::DrawMeshSection(const FRTMaterialInfo& MaterialInfo, const TArray<FVector>& Vertices, const TArray<int32>& Triangles, const TArray<FVector>& Normals,
-	const TArray<FVector2D>& UV0, const TArray<FColor>& VertexColor, const TArray<FRuntimeMeshTangent>& Tangents, bool bCreateCollision)
-{			
+	const TArray<FVector2D>& UV0, const TArray<FColor>& VertexColor, const TArray<FProcMeshTangent>& Tangents, bool bCreateCollision)
+{
 	CreateRuntimeMeshComponent(MaterialInfo.RuntimeMeshCompnenentName);
-	RuntimeMeshComponents[MaterialInfo.RuntimeMeshCompnenentName]->CreateSectionFromComponents(0, MaterialInfo.SectionIndex, MaterialInfo.MaterialIndex,
-		Vertices, Triangles, Normals, UV0, VertexColor, Tangents, ERuntimeMeshUpdateFrequency::Infrequent, bCreateCollision);
+	RuntimeMeshComponents[MaterialInfo.RuntimeMeshCompnenentName]->CreateMeshSection(MaterialInfo.SectionIndex,
+		Vertices, Triangles, Normals, UV0, VertexColor, Tangents, bCreateCollision);
 	
 	SetupMaterial(MaterialInfo);
 
@@ -62,12 +61,12 @@ void ARTMeshActor::DrawMeshSection(const FRTMaterialInfo& MaterialInfo, const TA
 	ImportedMeshData.Add(SectionRecord);
 }
 
-void ARTMeshActor::ChangeSectionTexture(URuntimeMeshComponentStatic* RuntimeMeshComponent, FName TextureParameterName, FString TexturePath)
+void ARTMeshActor::ChangeSectionTexture(UProceduralMeshComponent* ProceduralMeshComponent, FName TextureParameterName, FString TexturePath)
 {
-	UMaterialInstanceDynamic* MID = Cast<UMaterialInstanceDynamic>(RuntimeMeshComponent->GetMaterial(0));
+	UMaterialInstanceDynamic* MID = Cast<UMaterialInstanceDynamic>(ProceduralMeshComponent->GetMaterial(0));
 	if (MID == nullptr)
 	{
-		MID = UMaterialInstanceDynamic::Create(MasterMaterial, RuntimeMeshComponent);
+		MID = UMaterialInstanceDynamic::Create(MasterMaterial, ProceduralMeshComponent);
 	}
 	
 	UTexture2D* NewTexture = FImageUtils::ImportFileAsTexture2D(TexturePath);
@@ -97,7 +96,7 @@ void ARTMeshActor::ChangeSectionTexture(URuntimeMeshComponentStatic* RuntimeMesh
 
 void ARTMeshActor::CreateRuntimeMeshComponent(FString ComponentName)
 {
-	URuntimeMeshComponentStatic* MeshComponent = NewObject<URuntimeMeshComponentStatic>(this, FName(*ComponentName));
+	UProceduralMeshComponent* MeshComponent = NewObject<UProceduralMeshComponent>(this, FName(*ComponentName));
 	MeshComponent->SetupAttachment(GetRootComponent());
 	MeshComponent->RegisterComponent();
 	
@@ -174,7 +173,7 @@ void ARTMeshActor::SetupMaterial(const FRTMaterialInfo& MaterialInfo)
 		SetupTexture(MID, AmbientName, MaterialInfo.AmbientOcclusionTexture, TexturePaths);
 	}
 
-	RuntimeMeshComponents[MaterialInfo.RuntimeMeshCompnenentName]->SetMaterial(MaterialInfo.MaterialIndex, MID);
+	RuntimeMeshComponents[MaterialInfo.RuntimeMeshCompnenentName]->SetMaterial(MaterialInfo.SectionIndex, MID);
 	
 	// Save all imported texture path for this section
 	ImportedTexturePathsList.Add(TexturePaths);
@@ -266,7 +265,7 @@ void ARTMeshActor::SaveMeshToRecord(FRTSaveMeshRecord& OutRecord)
 
 		// Create material record
 		FRTSaveMaterialRecord MaterialRecord;
-		MaterialRecord.SectionIndex = 0; // Each RuntimeMeshComponent only has one section so the section index is always 0
+		MaterialRecord.SectionIndex = 0; // Each UProceduralMeshComponent only has one section so the section index is always 0
 		MaterialRecord.MaterialIndex = 0;
 		MaterialRecord.MaterialName = MID->GetName();
 		MaterialRecord.BaseColor = MID->K2_GetVectorParameterValue(BaseColorName);
@@ -306,11 +305,11 @@ void ARTMeshActor::LoadMeshFromRecord(const FRTSaveMeshRecord& FromRecord)
 	{		
 		FString ComponentName = FString::FromInt(Index);
 
-		TArray<FRuntimeMeshTangent> Tangents;
+		TArray<FProcMeshTangent> Tangents;
 		Tangents.Reserve(Section.Tangents.Num());
 		for (auto Tangent : Section.Tangents)
 		{
-			Tangents.Push(FRuntimeMeshTangent(Tangent));
+			Tangents.Push(FProcMeshTangent(Tangent, false));
 		}
 		
 		// Create Material Info
@@ -499,7 +498,7 @@ void ARTMeshActor::ConvertTextureToArray(UTexture2D* InTexture, TArray<uint8>& O
 		TArray<FColor> ColorArray;
 		ColorArray.SetNumUninitialized(InTextureX * InTextureY);
 		
-		uint8* Raw = static_cast<uint8*>(InTexture->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE));				
+		uint8* Raw = static_cast<uint8*>(InTexture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE));				
 		
 		FColor Pixel = FColor(0, 0, 0, 255);
 
@@ -517,13 +516,13 @@ void ARTMeshActor::ConvertTextureToArray(UTexture2D* InTexture, TArray<uint8>& O
 			}
 		}				
 
-		InTexture->PlatformData->Mips[0].BulkData.Unlock();
+		InTexture->GetPlatformData()->Mips[0].BulkData.Unlock();
 		InTexture->UpdateResource();
 
 		//int32 BufferSize = ColorArray.Num() * 4;
 		//OutArray.SetNumUninitialized(BufferSize);
 
 		//FMemory::Memcpy(OutArray.GetData(), ColorArray.GetData(), BufferSize);
-		FImageUtils::CompressImageArray(InTextureX, InTextureY, ColorArray, OutArray);
+		FImageUtils::ThumbnailCompressImageArray(InTextureX, InTextureY, ColorArray, OutArray);
 	}
 }
