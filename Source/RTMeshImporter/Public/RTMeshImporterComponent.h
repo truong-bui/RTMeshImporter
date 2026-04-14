@@ -1,6 +1,6 @@
 /************************************************************************************
  *																					*
- * Copyright (C) 2020 Truong Bui.													*
+ * Copyright (C) 2021 Truong Bui.													*
  * Website:	https://github.com/truong-bui/RTMeshImporter							*
  * Licensed under the MIT License. See 'LICENSE' file for full license information. *
  *																					*
