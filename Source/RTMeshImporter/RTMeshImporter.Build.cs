@@ -31,23 +31,16 @@ public class RTMeshImporter : ModuleRules
 	public RTMeshImporter(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
+
 		PublicIncludePaths.AddRange( new string[] { Path.Combine(ThirdPartyPath, "assimp/include") } );
-				
-		
-		PrivateIncludePaths.AddRange( new string[] {} );			
-		
-		PublicDependencyModuleNames.AddRange( new string[] { "Core", "ProceduralMeshComponent" } );			
-		
+
+		PublicDependencyModuleNames.AddRange( new string[] { "Core", "ProceduralMeshComponent" } );
+
 		PrivateDependencyModuleNames.AddRange( new string[] { "CoreUObject", "Engine", "Slate", "SlateCore", "UMG", "AppFramework" } );
-		
-		string PlatformDir = (Target.Platform == UnrealTargetPlatform.Win64) ? "Win64" : "Win32";
-			string LibraryName = (Target.Platform == UnrealTargetPlatform.Win64) ? "assimp-vc142-mt.lib" : "assimp-vc141-mt.lib";
-			string RuntimeLibName = (Target.Platform == UnrealTargetPlatform.Win64) ? "assimp-vc142-mt.dll" : "assimp-vc141-mt.dll";
 
-			PublicAdditionalLibraries.Add(Path.Combine(ThirdPartyPath, "assimp/lib", PlatformDir, LibraryName));
+		PublicAdditionalLibraries.Add(Path.Combine(ThirdPartyPath, "assimp/lib/Win64/assimp-vc142-mt.lib"));
 
-			RuntimeDependencies.Add(Path.Combine(BinariesPath, PlatformDir, RuntimeLibName));
+		RuntimeDependencies.Add(Path.Combine(BinariesPath, "Win64/assimp-vc142-mt.dll"));
 
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]

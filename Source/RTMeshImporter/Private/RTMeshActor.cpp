@@ -82,7 +82,7 @@ void ARTMeshActor::ChangeSectionTexture(UProceduralMeshComponent* ProceduralMesh
 		int32 SectionIndex = 0;
 		for (auto MeshComponent : RuntimeMeshComponents)
 		{
-			if (MeshComponent.Value == RuntimeMeshComponent)
+			if (MeshComponent.Value == ProceduralMeshComponent)
 			{
 				break;
 			}
